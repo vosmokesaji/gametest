@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>lottie 极简Demo</title>
+    <!-- 第一步: 引入 lottie -->
+    <script src="ali-lottie.min.js"></script>
+
+    <style>
+        body{
+            margin: 0;
+            position: relative;
+            background-color: #251149;
+        }
+        .btn{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            height: 100px;
+            width: 200px;
+            background-color: rgba(0,0,0,0.3);
+            border-radius: 30px;
+
+            position: absolute;
+            bottom: 130px;
+            left: 90px;
+            color: #fff;
+            transition: all .2s ease-in-out;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+
+
+
+
+        .card-wrap{
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            perspective: 500px;
+            -webkit-perspective: 500px;
+        }
+        .card-wrap.show{
+            display: flex;
+        }
+        .card-scale{
+            transform: scale(0.1);
+            transition: all 1s cubic-bezier(0.29, 1.72, 0.55, 1.01);
+            perspective: 500px;
+            -webkit-perspective: 500px;
+        }
+        .card{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            background-color: #fdbb25;
+            border-radius: 20px;
+            height: 360px;
+            width: 280px;
+            color: #b7701e;
+            opacity: 0;
+            transform: rotateY(360deg);
+            transition: all 1.5s cubic-bezier(0.29, 1.64, 0.55, 0.99);
+        }
+
+
+        .fadein .card{
+            transform: rotateY(0deg);
+            opacity: 1;
+            box-shadow: 0 0 40px rgba(251,187,37,0.9);
+            animation-name: bilibili;
+            animation-duration: 4s;
+            animation-iteration-count: infinite;
+        }
+        .fadein .card-scale{
+            transform: scale(1);
+        }
+
+        @keyframes bilibili {
+            0%{ box-shadow: 0 0 20px rgba(251,187,37,0.6); }
+            20%{ box-shadow: 0 0 60px rgba(251,187,37,0.9); }
+            100%{ box-shadow: 0 0 20px rgba(251,187,37,0.6); }
+        }
+    </style>
+</head>
+<body>
+<!-- 第二步: 创建容器 -->
+<div id="container"></div>
+
+
+<div class="btn" id="fly">起飞</div>
+
+<div class="card-wrap" id="cardWrap">
+    <div class="card-scale">
+        <div class="card">
+            一飞冲天
+        </div>
+    </div>
+</div>
+
+
+<!--<div id="status">循环播放3次后停止</div>-->
+<!--<div id="loop"></div>-->
+</body>
+<script>
+    let readyTimer;
+    let startTimer;
+
+
+    // 第三步: 实例化
+    var anim = lottie.loadAnimation({
+        container: document.getElementById("container"), // 容器
+        renderer: "svg",
+        loop: false,
+        autoplay: true,
+        path: "ali-data.json" // the path to the animation json
+    });
+
+    readyTimer = setInterval(()=>{
+        anim.goToAndStop(0, true);
+        anim.playSegments([0, 144], true);
+        console.log("replay");
+    }, 5577);
+    // 5633
+    // anim.setSpeed(2.1)
+    // console.log(anim.get);
+
+    const fly = document.getElementById("fly");
+
+    fly.addEventListener("touchstart", (e)=>{
+        e.target.style.backgroundColor = "rgba(0,0,0,0.6)";
+
+        console.log("按下");
+        clearInterval(readyTimer);
+
+
+        const startFn = function(){
+            console.log("按下 loop")
+            anim.goToAndStop(145,true);
+            anim.playSegments([145, 215], true);
+            startTimer = setTimeout(()=>{
+                startFn();
+            },2692);
+        }
+        startFn();
+
+    })
+    fly.addEventListener("touchend", (e)=>{
+        e.target.style.backgroundColor = "";
+
+        clearTimeout(startTimer);
+        console.log("抬起");
+        // anim.goToAndStop(216, true);
+        anim.goToAndPlay(216, true);
+        anim.playSegments([216, 504], false);
+    })
+
+    let cardLock = false;
+    let count = 0
+    anim.onEnterFrame = function(e){
+
+        // console.log(count);
+        // count ++;
+        // if(count%40 === 0){
+        //     console.log(e);
+        // }
+
+
+        // console.log(e);
+        if(e.totalTime >= 280 && e.currentTime > 170 && !cardLock){
+            // console.log(e.currentTime);
+            cardLock = true;
+
+            const cardWrap = document.getElementById("cardWrap")
+
+            cardWrap.classList.add("show");
+            setTimeout(()=>{
+                cardWrap.classList.add("fadein");
+            },100)
+        }
+    }
+
+
+
+
+    // var loopCount = 0;
+    // anim.onLoopComplete = function() {
+    //     loopCount += 1;
+    //     document.getElementById("loop").textContent = `播放了${loopCount}次`;
+    //     if (loopCount >= 3) {
+    //         anim.stop();
+    //     }
+    // };
+
+
+
+
+</script>
+</html>

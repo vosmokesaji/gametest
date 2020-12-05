@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!--  Meta  -->
+    <meta charset="UTF-8" />
+    <title>Bodymovin Demo</title>
+    
+    <!--  Styles  -->
+    <link rel="stylesheet" href="styles/index.css">
+</head>
+<body>
+    <div id="svgContainer" style=""></div>
+
+    <div class="btns">
+        <div class="btn" onclick="reload()">RELOAD</div>
+        <div class="btn" onclick="play()">PLAY</div>
+        <div class="btn" onclick="stop()">STOP</div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="scripts/bodymovin.js"></script>
+
+
+<!--    <script src="scripts/data.js"></script>-->
+    <script>
+
+
+        /* Shapes */
+        var svgContainer = document.getElementById('svgContainer');
+        var animItem = bodymovin.loadAnimation({
+          wrapper: svgContainer,
+          animType: 'svg',
+          loop: true,
+          // animationData: JSON.parse(animationData)
+            path: 'data.json'
+        });
+
+
+        animItem.setSpeed(.3);
+
+        // console.log(animItem.getDuration());
+
+
+        function play (){
+            animItem.play();
+        }
+        function stop (){
+            animItem.pause();
+        }
+        function reload (){
+            window.location.reload();
+        }
+
+</script>
+</body>
+</html>
