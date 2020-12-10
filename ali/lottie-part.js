@@ -32,12 +32,16 @@ var AnimationItem = function () {
     this.audioController = audioControllerFactory();
 };
 
-
+/**
+ * 将完整的 params 赋值给实例的属性
+ * @param params
+ */
 AnimationItem.prototype.setParams = function(params) {
     if(params.wrapper || params.container){
         this.wrapper = params.wrapper || params.container;
     }
 
+    // LZQ Note: 渲染类型属性 animType > renderer ， 默认 svg
     var animType = params.animType ? params.animType : params.renderer ? params.renderer : 'svg';
     switch(animType){
         case 'canvas':
@@ -54,6 +58,7 @@ AnimationItem.prototype.setParams = function(params) {
     this.renderer.setProjectInterface(this.projectInterface);
     this.animType = animType;
 
+    // LZQ Note: loop 传 true 不传 或者传空值、空字符串认默认 true
     if (params.loop === ''
         || params.loop === null
         || params.loop === undefined
@@ -94,6 +99,11 @@ AnimationItem.prototype.setParams = function(params) {
 
 };
 
+/**
+ * 设置 data 这个函数是从容器上取属性来组建  data 的
+ * @param wrapper 容器
+ * @param animationData 动画数据
+ */
 AnimationItem.prototype.setData = function (wrapper, animationData) {
     var params = {
         wrapper: wrapper,
@@ -101,6 +111,7 @@ AnimationItem.prototype.setData = function (wrapper, animationData) {
     };
     var wrapperAttributes = wrapper.attributes;
 
+    // LZQ Note: 看样子支持属性传参 ， 各自有优先级
     params.path = wrapperAttributes.getNamedItem('data-animation-path') ? wrapperAttributes.getNamedItem('data-animation-path').value : wrapperAttributes.getNamedItem('data-bm-path') ? wrapperAttributes.getNamedItem('data-bm-path').value :  wrapperAttributes.getNamedItem('bm-path') ? wrapperAttributes.getNamedItem('bm-path').value : '';
     params.animType = wrapperAttributes.getNamedItem('data-anim-type') ? wrapperAttributes.getNamedItem('data-anim-type').value : wrapperAttributes.getNamedItem('data-bm-type') ? wrapperAttributes.getNamedItem('data-bm-type').value : wrapperAttributes.getNamedItem('bm-type') ? wrapperAttributes.getNamedItem('bm-type').value :  wrapperAttributes.getNamedItem('data-bm-renderer') ? wrapperAttributes.getNamedItem('data-bm-renderer').value : wrapperAttributes.getNamedItem('bm-renderer') ? wrapperAttributes.getNamedItem('bm-renderer').value : 'canvas';
 
@@ -125,6 +136,10 @@ AnimationItem.prototype.setData = function (wrapper, animationData) {
     this.setParams(params);
 };
 
+/**
+ * todo 图层信息？ maybe 对开发没用
+ * @param data
+ */
 AnimationItem.prototype.includeLayers = function(data) {
     if(data.op > this.animationData.op){
         this.animationData.op = data.op;
@@ -163,6 +178,9 @@ AnimationItem.prototype.includeLayers = function(data) {
     this.loadNextSegment();
 };
 
+/**
+ * 载入下一个片段 开发没用
+ */
 AnimationItem.prototype.loadNextSegment = function() {
     var segments = this.animationData.segments;
     if(!segments || segments.length === 0 || !this.autoloadSegments){
@@ -179,6 +197,9 @@ AnimationItem.prototype.loadNextSegment = function() {
     }.bind(this));
 };
 
+/**
+ * 载入片段 开发没用
+ */
 AnimationItem.prototype.loadSegments = function() {
     var segments = this.animationData.segments;
     if(!segments) {
@@ -187,17 +208,27 @@ AnimationItem.prototype.loadSegments = function() {
     this.loadNextSegment();
 };
 
+/**
+ * 载入图片 开发没用
+ */
 AnimationItem.prototype.imagesLoaded = function() {
     this.trigger('loaded_images');
     this.checkLoaded()
 }
 
+/**
+ * 图片预加载
+ */
 AnimationItem.prototype.preloadImages = function() {
     this.imagePreloader.setAssetsPath(this.assetsPath);
     this.imagePreloader.setPath(this.path);
     this.imagePreloader.loadAssets(this.animationData.assets, this.imagesLoaded.bind(this));
 }
 
+/**
+ * 配置动画 开发没用
+ * @param animData 动画 json
+ */
 AnimationItem.prototype.configAnimation = function (animData) {
     if(!this.renderer){
         return;
@@ -234,6 +265,9 @@ AnimationItem.prototype.configAnimation = function (animData) {
     }
 };
 
+/**
+ * 等待字体载入 开发没用 基本
+ */
 AnimationItem.prototype.waitForFontsLoaded = function(){
     if(!this.renderer) {
         return;
@@ -245,6 +279,10 @@ AnimationItem.prototype.waitForFontsLoaded = function(){
     }
 }
 
+
+/**
+ * 检查载入
+ */
 AnimationItem.prototype.checkLoaded = function () {
     if (!this.isLoaded
         && this.renderer.globalData.fontManager.isLoaded
@@ -266,15 +304,29 @@ AnimationItem.prototype.checkLoaded = function () {
     }
 };
 
+/**
+ * 重新适应尺寸
+ */
 AnimationItem.prototype.resize = function () {
     this.renderer.updateContainerSize();
 };
 
+/**
+ * 设置是否补间，简单来讲：
+ * 设置 false 不补间，按原始帧率播放，性能好，可能看起来会有些卡
+ * 设置 true 进行补间，会补到至少 60 帧，看起来很流畅，但可能会引起设备发热，性能不好的设备也可能卡顿
+ * @param flag
+ * https://zhuanlan.zhihu.com/p/133868554 解密 Lottie 的 setSubframe()
+ */
 AnimationItem.prototype.setSubframe = function(flag){
     this.isSubframeEnabled = !!flag;
 };
 
+/**
+ * 播放帧，处理补间与否
+ */
 AnimationItem.prototype.gotoFrame = function () {
+    // LZQ Note: ~~ 精髓，直接取整，
     this.currentFrame = this.isSubframeEnabled ? this.currentRawFrame : ~~this.currentRawFrame;
 
     if(this.timeCompleted !== this.totalFrames && this.currentFrame > this.timeCompleted){
@@ -284,6 +336,9 @@ AnimationItem.prototype.gotoFrame = function () {
     this.renderFrame();
 };
 
+/**
+ * 渲染帧
+ */
 AnimationItem.prototype.renderFrame = function () {
     if(this.isLoaded === false){
         return;
@@ -295,10 +350,17 @@ AnimationItem.prototype.renderFrame = function () {
     }
 };
 
+/**
+ * 播放动画
+ * @param name
+ */
 AnimationItem.prototype.play = function (name) {
+    // 如果传了 name 一定不要传其他的
     if(name && this.name != name){
         return;
     }
+
+
     if (this.isPaused === true) {
         this.isPaused = false;
         this.audioController.resume();
