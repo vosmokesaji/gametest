@@ -6,8 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>lottie 极简Demo</title>
     <!-- 第一步: 引入 lottie -->
-    <script src="ali-lottie.min.js"></script>
-
+<!--    <script src="ali-lottie.min.js"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.5/lottie.min.js" integrity="sha512-0bCDSnaX8FOD9Mq8WbHcDwshXwCB5V4EP+UBu87WQgga2b7lAsuEbaSmIZjH/XEmNhJuhrPbFHemre5HZwrk9w==" crossorigin="anonymous"></script>
     <style>
         body{
             margin: 0;
@@ -21,6 +21,7 @@
         }
         #container{
             overflow: hidden;
+
         }
 
         .btn{
@@ -152,19 +153,32 @@
     </div>
 </div>
 
-
-<!--<div id="status">循环播放3次后停止</div>-->
-<!--<div id="loop"></div>-->
 </body>
 <script>
+    let cOpen = false;
+    const CLOG = function(a){
+        if(cOpen){
+            console.log(a)
+        }
+    }
+    
+    
+    // ready 动画循环的定时器
     let readyTimer;
-    let startTimer;
+
+    // 按下蓄力动画的定时器
+    let pressTimer;
+    
+    // 卡片锁 ， 为 true 表示卡片此时已经展示，不能再出卡片了；为 false 时表示卡片未展示，可以进入展示卡片的逻辑
     let cardLock = false;
 
     // 0 可以按下  1： 按下中  2 抬起，但在动画过程中 ，不可再次点击
     let buttonTapState = 0;
 
-
+    // init 执行过程中 这个值是 false
+    let canInit = true;
+    
+    lottie.setQuality("high");
 
 
     // 第三步: 实例化
@@ -172,35 +186,121 @@
         container: document.getElementById("container"), // 容器
         renderer: "svg",
         loop: false,
-        autoplay: true,
+        autoplay: false,
         path: "ali-data.json" // the path to the animation json
     });
 
+    // 为啥 要先完整的执行一遍动画  才会执行 这里边的片段
+    // anim.playSegments([[100, 200],[150, 250],[200, 300],[250, 350],[300, 400],[350, 450],[400, 500]], true);
 
+    // ready 0 - 144 帧
+    CLOG("ready loop")
+
+    // 1. 到某一帧，暂停的方法
+    // anim.goToAndStop(12, true);
+    // anim.play();
+
+    // anim.setDirection(-10)
+    // 直接设置 没卵用
+    // anim.playSegments([400, 450], true);
+    // setTimeout(()=>{
+    //     // anim.stop();
+    // },300)
+
+
+
+    // anim.addEventListener("complete", (...a) => {
+    //     // loop 为 false 时才会生效
+    //     CLOG("ACTION complete", a);
+    // })
+    // anim.addEventListener("loopComplete", (...a) => {
+    //     // loop 为 true 时才会生效
+    //         // currentLoop: 10  循环次数
+    //         // direction: 1
+    //         // totalLoops: true
+    //         // type: "loopComplete"
+    //     CLOG("ACTION loopComplete", a);
+    // })
+    // anim.addEventListener("enterFrame", (...a) => {
+    //     // CLOG("ACTION enterFrame", a);
+    // })
+    // anim.addEventListener("segmentStart", (...a) => {
+    //     CLOG("ACTION segmentStart", a);
+    // })
+    // anim.addEventListener("config_ready", (...a) => {
+    //     // DONE
+    //     CLOG("ACTION config_ready", a);
+    // })
+    // anim.addEventListener("data_ready", (...a) => {
+    //     // DONE
+    //     CLOG("ACTION data_ready", a);
+    // })
+    // anim.addEventListener("DOMLoaded", (...a) => {
+    //     // DONE
+    //     CLOG("ACTION DOMLoaded", a);
+    // })
+    // anim.addEventListener("destroy", (...a) => {
+    //     CLOG("ACTION destroy", a);
+    // })
+
+
+    function frame2ms(start, end, frameRate) {
+        return Math.floor(Math.abs(end - start) / frameRate * 1000);
+    }
+
+    /** 动画分为三个阶段
+     * 1. ready 准备阶段：
+     * 2. press 蓄力阶段：
+     * 3. 飞行阶段
+     * @type {{READY_END: number, FLY_START: number, FLY_END: number, READY_START: number, PRESS_START: number, FRAME_RATE: number, PRESS_END: number, BOOM_FRAME: number}}
+     */
+
+    const CFG = {
+        // 这个帧率是可以通过配置文件获取到的（应该不用配置）
+        FRAME_RATE: 24,
+
+        READY_START: 0,
+        READY_END: 144,
+
+        PRESS_START: 145,
+        PRESS_END: 214,
+
+        FLY_START: 213,
+        FLY_END: 504,
+
+        BOOM_FRAME: 390,
+    }
+
+    // ready 时间
+    CFG.READY_TIME_MS = frame2ms(CFG.READY_END, CFG.READY_START, CFG.FRAME_RATE);
+    // CLOG("=======", CFG.READY_TIME_MS);
+
+    // press
+    CFG.PRESS_TIME_MS = frame2ms(CFG.PRESS_END, CFG.PRESS_START, CFG.FRAME_RATE);
+
+
+
+    // 初始化 动画
     init = function(timeout) {
-
+        canInit = false;
+        CLOG("init called =======================");
         const cardWrap = document.getElementById("cardWrap")
         cardWrap.classList.remove("fadein");
 
         const readyFn = function(){
-            console.log("ready loop")
-            anim.goToAndStop(0, true);
-            anim.playSegments([0, 144], true);
+            CLOG("ready loop");
+            anim.playSegments([CFG.READY_START, CFG.READY_END], true);
             readyTimer = setTimeout(()=>{
                 readyFn();
-            },5577);
+                CLOG("in readyTimer");
+            }, CFG.READY_TIME_MS);
         }
         readyFn();
 
         setTimeout(()=>{
             cardWrap.classList.remove("show");
-
-
-            // 5633
-            // anim.setSpeed(2.1)
-            // console.log(anim.get);
-
             cardLock = false;
+            canInit = true;
         }, timeout);
     }
 
@@ -210,27 +310,31 @@
     const fly = document.getElementById("fly");
 
     fly.addEventListener("touchstart", (e)=>{
-        e.target.style.backgroundColor = "rgba(0,0,0,0.6)";
-        console.log("按下");
+        CLOG("按钮按下 ===========================");
 
         if(buttonTapState !== 0) return;
         buttonTapState = 1;
+
+        e.target.style.backgroundColor = "rgba(0,0,0,0.6)";
         fly.innerText = `起飞${buttonTapState}`;
 
-        clearInterval(readyTimer);
+        clearTimeout(readyTimer);
+
 
         const startFn = function(){
-            console.log("按下 loop")
-            anim.goToAndStop(145,true);
-            anim.playSegments([145, 215], true);
-            startTimer = setTimeout(()=>{
+            CLOG("按下 loop")
+            anim.playSegments([CFG.PRESS_START, CFG.PRESS_END], true);
+            pressTimer = setTimeout(()=>{
                 startFn();
-            },2692);
+                CLOG("in 按下Timer");
+            }, CFG.PRESS_TIME_MS);
         }
         startFn();
 
     })
+
     fly.addEventListener("touchend", (e)=>{
+        CLOG("按钮抬起 ===========================");
 
         if(buttonTapState !== 1) return;
         buttonTapState = 2;
@@ -238,26 +342,22 @@
 
         e.target.style.backgroundColor = "";
 
-        clearTimeout(startTimer);
-        console.log("抬起");
-        // anim.goToAndStop(216, true);
-        anim.goToAndStop(213, true);
-        anim.playSegments([213, 504], false);
+        clearTimeout(pressTimer);
+        anim.playSegments([CFG.FLY_START, CFG.FLY_END], true);
     })
 
-    let count = 0
+
+    // 抓住爆炸的时机 触发卡片
     anim.onEnterFrame = function(e){
 
-        // console.log(count);
-        // count ++;
-        // if(count%40 === 0){
-        //     console.log(e);
-        // }
+
+        // 爆炸逻辑
+        if(e.totalTime === (CFG.FLY_END - CFG.FLY_START)
+            && e.currentTime >= (CFG.BOOM_FRAME - CFG.FLY_START)
+            && !cardLock){
+            CLOG("爆炸逻辑 ======================");
 
 
-        // console.log(e);
-        if(e.totalTime >= 280 && e.currentTime > 170 && !cardLock){
-            // console.log(e.currentTime);
             if(buttonTapState !== 2) return;
             buttonTapState = 0;
             cardLock = true;
@@ -270,26 +370,34 @@
                 cardWrap.classList.add("fadein");
             },100)
         }
+
+
+        // 起飞逻辑
+        // if(e.totalTime === (CFG.PRESS_END - CFG.PRESS_START)
+        //     && e.currentTime >= (CFG.BOOM_FRAME - CFG.FLY_START)
+        //     && !cardLock){
+        //
+        //     if(buttonTapState !== 2) return;
+        //     buttonTapState = 0;
+        //     cardLock = true;
+        //     fly.innerText = `起飞${buttonTapState}`;
+        //
+        //     const cardWrap = document.getElementById("cardWrap")
+        //
+        //     cardWrap.classList.add("show");
+        //     setTimeout(()=>{
+        //         cardWrap.classList.add("fadein");
+        //     },100)
+        // }
     }
 
-
+    // 重置游戏
     document.getElementById("cardWrap").addEventListener("click", ()=>{
-        init(1100);
+        if(canInit){
+            CLOG("cardWrap Clicked");
+            init(1100);
+        }
     })
-
-
-
-    // var loopCount = 0;
-    // anim.onLoopComplete = function() {
-    //     loopCount += 1;
-    //     document.getElementById("loop").textContent = `播放了${loopCount}次`;
-    //     if (loopCount >= 3) {
-    //         anim.stop();
-    //     }
-    // };
-
-
-
 
 </script>
 </html>
