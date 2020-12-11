@@ -30,7 +30,7 @@
     }
     .card-scale{
         transform: scale(0.1);
-        transition: all 1s cubic-bezier(0.29, 1.72, 0.55, 1.01);
+        transition: all 5s cubic-bezier(0.29, 1.72, 0.55, 1.01);
         perspective: 500px;
         -webkit-perspective: 500px;
     }
@@ -48,7 +48,7 @@
         color: #b7701e;
         opacity: .3;
         transform: rotateY(360deg);
-        transition: all 1.5s cubic-bezier(0.29, 1.64, 0.55, 0.99);
+        transition: all 5s cubic-bezier(0.29, 1.64, 0.55, 0.99);
         overflow: hidden;
 
         -moz-user-select: none;
@@ -156,7 +156,7 @@
             cardWrap.classList.remove("fadein");
             setTimeout(()=>{
                 cardWrap.classList.remove("show");
-            },400)
+            },5000)
         }else{
             cardWrap.classList.add("show");
             setTimeout(()=>{
