@@ -12,15 +12,21 @@
     body{
         margin: 0;
     }
+
     .card-wrap{
-        display: flex;
+        position: fixed;
+        left: 0;
+        top: 0;
+        display: none;
         justify-content: center;
         align-items: center;
-        background-color: #9e1b2c;
         width: 100vw;
         height: 100vh;
         perspective: 500px;
         -webkit-perspective: 500px;
+    }
+    .card-wrap.show{
+        display: flex;
     }
     .card-scale{
         transform: scale(0.1);
@@ -31,6 +37,7 @@
     .card{
         position: relative;
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
         font-size: 40px;
@@ -39,10 +46,15 @@
         height: 360px;
         width: 280px;
         color: #b7701e;
-        opacity: 0;
+        /*opacity: 0;*/
         transform: rotateY(360deg);
         transition: all 1.5s cubic-bezier(0.29, 1.64, 0.55, 0.99);
         overflow: hidden;
+
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -webkit-user-select: none;
+        user-select: none;
     }
     .light{
         cursor: pointer;
@@ -81,10 +93,11 @@
     }
     @keyframes light {
         0%{ left: -120%; }
-        15%{ left: 120%; }
+        30%{ left: 120%; }
         99.9%{ left: 120%; }
         100%{ left: -120%; }
     }
+
 
     #toggle{
         display: flex;
@@ -136,8 +149,14 @@
 
         if(hasFadeIn){
             cardWrap.classList.remove("fadein");
+            setTimeout(()=>{
+                cardWrap.classList.remove("show");
+            },400)
         }else{
-            cardWrap.classList.add("fadein");
+            cardWrap.classList.add("show");
+            setTimeout(()=>{
+                cardWrap.classList.add("fadein");
+            },100)
         }
     })
 </script>
