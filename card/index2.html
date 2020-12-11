@@ -18,6 +18,7 @@
         left: 0;
         top: 0;
         display: none;
+        display: flex;
         justify-content: center;
         align-items: center;
         width: 100vw;
@@ -29,8 +30,9 @@
         display: flex;
     }
     .card-scale{
-        transform: scale(0.1);
-        transition: all 1.5s cubic-bezier(0.29, 1.72, 0.55, 1.01);
+        transform: scale(0);
+        /*transition: all 1.5s cubic-bezier(0.29, 1.72, 0.55, 1.01);*/
+        transition: all 1.5s cubic-bezier(0.81, 0.05, 0.22, 0.99);
         perspective: 500px;
         -webkit-perspective: 500px;
     }
@@ -46,15 +48,18 @@
         height: 360px;
         width: 280px;
         color: #b7701e;
-        opacity: .3;
-        transform: rotateY(360deg);
-        transition: all 1.5s cubic-bezier(0.29, 1.64, 0.55, 0.99);
+        /*opacity: .3;*/
+        /*transform: rotateY(360deg);*/
+        /*transition: all 1.5s cubic-bezier(0.29, 1.64, 0.55, 0.99);*/
+        transition: all 1.5s cubic-bezier(0.81, 0.05, 0.22, 0.99);
         overflow: hidden;
 
         -moz-user-select: none;
         -ms-user-select: none;
         -webkit-user-select: none;
         user-select: none;
+
+
     }
     .light{
         cursor: pointer;
