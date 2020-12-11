@@ -19,6 +19,15 @@
             width: 100vw;
             overflow: hidden;
         }
+        .game-box{
+            position: relative;
+            width: 100vw;
+            height: fit-content;
+            margin-left: 50vw;
+            margin-top: 50vh;
+            transform: translateY(-50%) translateX(-50%);
+        }
+
         #container{
             overflow: hidden;
 
@@ -35,7 +44,8 @@
             border-radius: 30px;
 
             position: absolute;
-            top: 610px;
+            /*top: 610px;*/
+            top: calc(50vh + 230px);
             left: 50%;
             transform: translateX(-50%);
             color: #fff;
@@ -46,10 +56,6 @@
             user-select: none;
             /*opacity: 0;*/
         }
-
-
-
-
 
         .card-wrap{
             position: fixed;
@@ -172,24 +178,27 @@
     </style>
 </head>
 <body>
-<!-- 第二步: 创建容器 -->
-<div id="container"></div>
+<div class="game-box">
+    <!-- 第二步: 创建容器 -->
+    <div id="container"></div>
 
-<div class="progress">
-    <div class="inner" id="inner"></div>
-</div>
+    <div class="progress">
+        <div class="inner" id="inner"></div>
+    </div>
 
-<div class="btn" id="fly">起飞</div>
+    <div class="btn" id="fly">起飞</div>
 
-<div class="card-wrap" id="cardWrap">
-    <div class="card-scale">
-        <div class="card">
-            <p>一飞冲天</p>
-            <p id="level">优秀</p>
-            <i class="light"></i>
+    <div class="card-wrap" id="cardWrap">
+        <div class="card-scale">
+            <div class="card">
+                <p>一飞冲天</p>
+                <p id="level">优秀</p>
+                <i class="light"></i>
+            </div>
         </div>
     </div>
 </div>
+
 
 </body>
 <script>
