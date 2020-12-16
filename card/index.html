@@ -6,6 +6,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Card</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.js"></script>
 
     <script type="text/javascript" src="//cdn.jsdelivr.net/npm/eruda"></script>
     <script>eruda.init();</script>
@@ -20,7 +21,7 @@
         position: fixed;
         left: 0;
         top: 0;
-        display: none;
+        display: flex;
         justify-content: center;
         align-items: center;
         width: 100vw;
@@ -72,7 +73,7 @@
         -moz-transform: skewx(-25deg);
         -webkit-transform: skewx(-25deg);
         animation-name: light;
-        animation-duration: 3s;
+        animation-duration: 6s;
         animation-iteration-count: infinite;
         animation-delay: 4s;
     }
@@ -96,10 +97,9 @@
         100%{ box-shadow: 0 0 20px rgba(251,187,37,0.6); }
     }
     @keyframes light {
-        0%{ left: -120%; }
-        30%{ left: 120%; }
-        99.9%{ left: 120%; }
-        100%{ left: -120%; }
+        0%{ left: -220%; }
+        30%{ left: 240%; }
+        100%{ left: 240%; }
     }
 
 
@@ -124,7 +124,10 @@
         transition: all .1s ease-in-out;
         box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
 
-        -webkit-touch-callout: none;
+        -webkit-touch-callout:none;
+        -moz-touch-callout:none;
+        -ms-touch-callout:none;
+        touch-callout:none;
         -webkit-user-select: none;
         -khtml-user-select: none;
         -moz-user-select: none;
@@ -147,28 +150,42 @@
         </div>
     </div>
 </div>
-<div id="toggle">..TOGGLE.</div>
+<div id="toggle">.TOGGLE.</div>
 
 <script>
     // setTimeout(()=>{
     //     document.getElementById("cardWrap").classList.add("fadein");
     // },1000)
+    //
+    // document.getElementById("toggle").addEventListener("click", ()=>{
+    //     const cardWrap = document.getElementById("cardWrap")
+    //     const hasFadeIn = cardWrap.classList.contains("fadein");
+    //
+    //     if(hasFadeIn){
+    //         cardWrap.classList.remove("fadein");
+    //         setTimeout(()=>{
+    //             cardWrap.classList.remove("show");
+    //         },1500)
+    //     }else{
+    //         cardWrap.classList.add("show");
+    //         setTimeout(()=>{
+    //             cardWrap.classList.add("fadein");
+    //         },100)
+    //     }
+    // })
+    // 我的魅族手机可能不兼容以上的写法 ， 没有办法添加 或者移除 class 导致动画没有触发
+    // css 3 的属性是支持的
+    // css 3 的 animation 需要在 animation 前 和 keyframe 前 添加 -webkit- 前缀才会生效
+    // 两个都得有，一个都不能少 ↑
+    // 需要研究一下这几个前缀在不同属性之前的作用
 
-    document.getElementById("toggle").addEventListener("click", ()=>{
-        const cardWrap = document.getElementById("cardWrap")
-        const hasFadeIn = cardWrap.classList.contains("fadein");
 
-        if(hasFadeIn){
-            cardWrap.classList.remove("fadein");
-            setTimeout(()=>{
-                cardWrap.classList.remove("show");
-            },1500)
-        }else{
-            cardWrap.classList.add("show");
-            setTimeout(()=>{
-                cardWrap.classList.add("fadein");
-            },100)
-        }
+
+    $("body").on("click", "#toggle", function(e){
+        console.log("wwww")
+        const box = $("#cardWrap");
+        console.log(box)
+        box.toggleClass("fadein");
     })
 </script>
 </body>
