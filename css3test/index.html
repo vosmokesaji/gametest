@@ -37,13 +37,28 @@
     </div>
 
 <script>
-$("body").on("click", ".toggle", function(e){
-    console.log("wwww")
-    const box = $(this).parents(".item").find(".box-wrap");
+$("body")
+    .on("click", ".toggle", function(e){
+        console.log("wwww")
+        const box = $(this).parents(".item").find(".box-wrap");
 
-    console.log(box)
-    box.toggleClass("active");
-})
+        console.log(box)
+        box.toggleClass("active");
+    })
+    .on("touchstart", ".toggle", function (e) {
+        e.preventDefault();
+        $(this).addClass("active");
+        const box = $(this).parents(".item").find(".box-wrap");
+
+        console.log(box)
+        box.toggleClass("active");
+    })
+    .on("touchend", ".toggle", function (e) {
+        e.preventDefault();
+        $(this).removeClass("active");
+    })
+
+
 </script>
 </body>
 </html>

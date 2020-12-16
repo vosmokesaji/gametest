@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>lottie 极简Demo</title>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
+    <!-- 第一步: 引入 lottie -->
+<!--    <script src="ali-lottie.min.js"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.5/lottie.min.js" integrity="sha512-0bCDSnaX8FOD9Mq8WbHcDwshXwCB5V4EP+UBu87WQgga2b7lAsuEbaSmIZjH/XEmNhJuhrPbFHemre5HZwrk9w==" crossorigin="anonymous"></script>
+    <style>
+        body{
+            margin: 0;
+            position: relative;
+            background-color: #251149;
+        }
+        html,body{
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+        .game-box{
+            position: relative;
+            width: 100vw;
+            min-height: 100vh;
+            height: fit-content;
+            margin-left: 50vw;
+            margin-top: 50vh;
+            transform: translateY(-50%) translateX(-50%);
+        }
+
+        #container{
+            overflow: hidden;
+
+        }
+
+        .btn{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            height: 120px;
+            width: 200px;
+            background-color: rgba(0,0,0,0.3);
+            border-radius: 30px;
+
+            position: absolute;
+            /*top: 610px;*/
+            top: calc(50vh + 230px);
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            transition: all .2s ease-in-out;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -webkit-user-select: none;
+            user-select: none;
+            /*opacity: 0;*/
+        }
+
+        .card-wrap{
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            perspective: 500px;
+            -webkit-perspective: 500px;
+        }
+        .card-wrap.show{
+            display: flex;
+        }
+        .card-scale{
+            transform: scale(0.1);
+            transition: all 1s cubic-bezier(0.29, 1.72, 0.55, 1.01);
+            perspective: 500px;
+            -webkit-perspective: 500px;
+        }
+        .card{
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            background-color: #fdbb25;
+            border-radius: 20px;
+            height: 360px;
+            width: 280px;
+            color: #b7701e;
+            opacity: 0;
+            transform: rotateY(360deg);
+            transition: all 1.5s cubic-bezier(0.29, 1.64, 0.55, 0.99);
+            overflow: hidden;
+
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .light{
+            cursor: pointer;
+            position: absolute;
+            left: -100%;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-image: -webkit-linear-gradient(0deg,hsla(0,0%,100%,0),hsla(0,0%,100%,.5),hsla(0,0%,100%,0));
+            transform: skewx(-25deg);
+            -o-transform: skewx(-25deg);
+            -moz-transform: skewx(-25deg);
+            -webkit-transform: skewx(-25deg);
+            animation-name: light;
+            animation-duration: 6s;
+            animation-iteration-count: infinite;
+        }
+
+
+        .fadein .card{
+            transform: rotateY(0deg);
+            opacity: 1;
+            box-shadow: 0 0 40px rgba(251,187,37,0.9);
+            animation-name: bilibili;
+            animation-duration: 4s;
+            animation-iteration-count: infinite;
+        }
+        .fadein .card-scale{
+            transform: scale(1);
+        }
+
+        @keyframes bilibili {
+            0%{ box-shadow: 0 0 20px rgba(251,187,37,0.6); }
+            20%{ box-shadow: 0 0 60px rgba(251,187,37,0.9); }
+            100%{ box-shadow: 0 0 20px rgba(251,187,37,0.6); }
+        }
+        @keyframes light {
+            0%{ left: -120%; }
+            30%{ left: 120%; }
+            99.9%{ left: 120%; }
+            100%{ left: -120%; }
+        }
+
+
+        .progress{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            border: 4px solid #fff;
+            width: 20px;
+            background-color: #fcc;
+            border-radius: 30px;
+
+            position: absolute;
+            top: 300px;
+            right: 10px;
+            transform: translateX(-50%);
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .progress .inner{
+            height: 20px;
+            position: absolute;
+            width: 20px;
+            bottom: 0;
+            left: 0;
+            border-radius: 20px;
+            background-color: #0f3;
+            min-height: 20px;
+            max-height: 300px;
+            transition: background-color .15s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+<div class="game-box">
+    <!-- 第二步: 创建容器 -->
+    <div id="container"></div>
+
+    <div class="progress">
+        <div class="inner" id="inner"></div>
+    </div>
+
+    <div class="btn" id="fly">起飞</div>
+
+    <div class="card-wrap" id="cardWrap">
+        <div class="card-scale">
+            <div class="card">
+                <p>一飞冲天</p>
+                <p id="level">优秀</p>
+                <i class="light"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+<script>
+    
+    /** 动画分为三个阶段
+     * 1. ready 准备阶段：
+     * 2. press 蓄力阶段：
+     * 3. 飞行阶段
+     * @type {{READY_END: number, FLY_START: number, FLY_END: number, READY_START: number, PRESS_START: number, FRAME_RATE: number, PRESS_END: number, BOOM_FRAME: number}}
+     */
+
+    const CFG = {
+        // 这个帧率是可以通过配置文件获取到的（应该不用配置）
+        FRAME_RATE: 24,
+
+        READY_START: 0,
+        READY_END: 144,
+
+        PRESS_START: 145,
+        PRESS_END: 214,
+
+        FLY_START: 213,
+        FLY_END: 504,
+
+        BOOM_FRAME: 390,
+    }
+
+    CFG.PERFRCT_FRAME = Math.floor((CFG.PRESS_END + CFG.PRESS_START) / 2);
+
+    // 卡片锁 ， 为 true 表示卡片此时已经展示，不能再出卡片了；为 false 时表示卡片未展示，可以进入展示卡片的逻辑
+    let cardLock = false;
+
+    // 卡片动画锁
+    let cardAnimateLock = false;
+
+    // 0 可以按下  1： 按下中  2 抬起，但在动画过程中 ，不可再次点击
+    let buttonTapState = 0;
+
+    // init 执行过程中 这个值是 false
+    let canInit = true;
+
+    let pressData = 0;
+
+
+    // 第三步: 实例化
+    var anim = lottie.loadAnimation({
+        container: document.getElementById("container"), // 容器
+        renderer: "svg",
+        loop: true,
+        autoplay: false,
+        path: "ali-data.json" // the path to the animation json
+    });
+
+    anim.setSubframe(false);
+
+
+    // 初始化 动画
+    init = function(timeout) {
+        canInit = false;
+        console.log("init called =======================");
+        buttonTapState = 0;
+
+        // 样式
+        const cardWrap = document.getElementById("cardWrap")
+        cardWrap.classList.remove("fadein");
+        fly.innerText = `起飞${buttonTapState}`;
+        document.getElementById("inner").style.height = `0`
+        document.getElementById("inner").style.backgroundColor = `#0f3`;
+
+        anim.playSegments([CFG.READY_START, CFG.READY_END], true);
+
+        setTimeout(()=>{
+            cardWrap.classList.remove("show");
+            cardLock = false;
+            canInit = true;
+        }, timeout);
+    }
+
+
+    anim.addEventListener("data_ready", (...a) => {
+        // DONE
+        console.log("ACTION data_ready", a);
+        anim.playSegments([CFG.READY_START, CFG.READY_END], true);
+    })
+
+    anim.addEventListener("loopComplete", (...a) => {
+        // loop 为 true 时才会生效
+        console.log("ACTION loopComplete", a);
+
+        if(buttonTapState === 0){
+            anim.playSegments([CFG.READY_START, CFG.READY_END], true);
+        }else if(buttonTapState === 1){
+            anim.playSegments([CFG.PRESS_START, CFG.PRESS_END], true);
+        }else if(buttonTapState === 2){
+            anim.playSegments([CFG.FLY_END - 80, CFG.FLY_END], true);
+        }
+    })
+
+
+    const fly = document.getElementById("fly");
+    fly.addEventListener("touchstart", (e)=>{
+        console.log("按钮按下 ===========================");
+
+        // 状态判断
+        if(buttonTapState !== 0) return;
+        buttonTapState = 1;
+
+        // 样式
+        e.target.style.backgroundColor = "rgba(0,0,0,0.6)";
+        fly.innerText = `起飞${buttonTapState}`;
+
+        // 播放动画
+        anim.playSegments([CFG.PRESS_START, CFG.PRESS_END], true);
+    })
+
+
+    fly.addEventListener("touchend", (e)=>{
+        console.log("按钮抬起 ===========================");
+
+        if(buttonTapState !== 1) return;
+        buttonTapState = 2;
+
+        fly.innerText = `起飞${buttonTapState}`;
+        e.target.style.backgroundColor = "";
+
+        anim.playSegments([CFG.FLY_START, CFG.FLY_END], true);
+
+
+        // 计算等级
+        // console.log("pressData: ======================");
+        // console.log("pressData: ", pressData);
+        // console.log("pressData: ++++++++++++++++++++++");
+    })
+
+
+    anim.onEnterFrame = function(e){
+
+        // 起飞逻辑
+        if(e.totalTime === (CFG.PRESS_END - CFG.PRESS_START)){
+
+
+            let progressFrame = Math.abs(CFG.PRESS_START + e.currentTime - CFG.PERFRCT_FRAME);
+            let progress = ((1 - progressFrame / (CFG.PERFRCT_FRAME - CFG.PRESS_START)) * 100).toFixed(2)
+
+            document.getElementById("inner").style.height = `${progress + 7}%`
+
+            if(progress  > 90){
+                document.getElementById("inner").style.backgroundColor = `#f00`;
+            }else if(pressData > 70){
+                document.getElementById("inner").style.backgroundColor = `#f66`;
+            }else{
+                document.getElementById("inner").style.backgroundColor = `#0f3`;
+            }
+
+            console.log(`${progress} %`);
+
+            pressData = progress;
+        }
+
+        // 爆炸逻辑
+        if(e.totalTime === (CFG.FLY_END - CFG.FLY_START)
+            && e.currentTime >= (CFG.BOOM_FRAME - CFG.FLY_START)
+            && !cardLock){
+            console.log("爆炸逻辑 ======================");
+
+
+            if(buttonTapState !== 2) return;
+            cardLock = true;
+            cardAnimateLock = true;
+
+            let Text = "不错哟";
+            if(pressData  > 90){
+                Text = "完美";
+            }else if(pressData > 70){
+                Text = "优秀";
+            }else if(pressData > 50){
+                Text = "害行吧";
+            }else{
+                Text = "菜鸡 🐔";
+            }
+
+
+            let temp = "   "
+
+            document.getElementById("level").innerText = Text;
+
+
+
+            fly.innerText = `起飞${buttonTapState}`;
+
+            const cardWrap = document.getElementById("cardWrap")
+
+            cardWrap.classList.add("show");
+            setTimeout(()=>{
+                cardWrap.classList.add("fadein");
+            },100)
+
+            // 这里可以改成 关闭按钮延时出现
+            setTimeout(()=>{
+                cardAnimateLock = false;
+            },2000)
+        }
+    }
+
+
+    // 重置游戏
+    document.getElementById("cardWrap").addEventListener("click", ()=>{
+        if(!cardAnimateLock && canInit){
+            console.log("cardWrap Clicked");
+            init(1100);
+        }
+    })
+
+
+    function frame2ms(start, end, frameRate) {
+        return Math.floor(Math.abs(end - start) / frameRate * 1000);
+    }
+
+
+    // 初始化 动画
+    // init = function(timeout) {
+    //     canInit = false;
+    //     console.log("init called =======================");
+    //     const cardWrap = document.getElementById("cardWrap")
+    //     cardWrap.classList.remove("fadein");
+    //
+    //     const readyFn = function(){
+    //         console.log("ready loop");
+    //         anim.playSegments([CFG.READY_START, CFG.READY_END], true);
+    //         readyTimer = setTimeout(()=>{
+    //             readyFn();
+    //             console.log("in readyTimer");
+    //         }, CFG.READY_TIME_MS);
+    //     }
+    //     readyFn();
+    //
+    //     setTimeout(()=>{
+    //         cardWrap.classList.remove("show");
+    //         cardLock = false;
+    //         canInit = true;
+    //     }, timeout);
+    // }
+    //
+    // init(0);
+    //
+    //
+    // const fly = document.getElementById("fly");
+    //
+    // fly.addEventListener("touchstart", (e)=>{
+    //     console.log("按钮按下 ===========================");
+    //
+    //     if(buttonTapState !== 0) return;
+    //     buttonTapState = 1;
+    //
+    //     e.target.style.backgroundColor = "rgba(0,0,0,0.6)";
+    //     fly.innerText = `起飞${buttonTapState}`;
+    //
+    //     clearTimeout(readyTimer);
+    //
+    //
+    //     const startFn = function(){
+    //         console.log("按下 loop")
+    //         anim.playSegments([CFG.PRESS_START, CFG.PRESS_END], true);
+    //         pressTimer = setTimeout(()=>{
+    //             startFn();
+    //             console.log("in 按下Timer");
+    //         }, CFG.PRESS_TIME_MS);
+    //     }
+    //     startFn();
+    //
+    // })
+    //
+    // fly.addEventListener("touchend", (e)=>{
+    //     console.log("按钮抬起 ===========================");
+    //
+    //     if(buttonTapState !== 1) return;
+    //     buttonTapState = 2;
+    //     fly.innerText = `起飞${buttonTapState}`;
+    //
+    //     e.target.style.backgroundColor = "";
+    //
+    //     clearTimeout(pressTimer);
+    //     anim.playSegments([CFG.FLY_START, CFG.FLY_END], true);
+    // })
+    //
+    //
+    // // 抓住爆炸的时机 触发卡片
+    // anim.onEnterFrame = function(e){
+    //
+    //
+    //     // 爆炸逻辑
+    //     if(e.totalTime === (CFG.FLY_END - CFG.FLY_START)
+    //         && e.currentTime >= (CFG.BOOM_FRAME - CFG.FLY_START)
+    //         && !cardLock){
+    //         console.log("爆炸逻辑 ======================");
+    //
+    //
+    //         if(buttonTapState !== 2) return;
+    //         buttonTapState = 0;
+    //         cardLock = true;
+    //         fly.innerText = `起飞${buttonTapState}`;
+    //
+    //         const cardWrap = document.getElementById("cardWrap")
+    //
+    //         cardWrap.classList.add("show");
+    //         setTimeout(()=>{
+    //             cardWrap.classList.add("fadein");
+    //         },100)
+    //     }
+    //
+    //
+    //     // 起飞逻辑
+    //     // if(e.totalTime === (CFG.PRESS_END - CFG.PRESS_START)
+    //     //     && e.currentTime >= (CFG.BOOM_FRAME - CFG.FLY_START)
+    //     //     && !cardLock){
+    //     //
+    //     //     if(buttonTapState !== 2) return;
+    //     //     buttonTapState = 0;
+    //     //     cardLock = true;
+    //     //     fly.innerText = `起飞${buttonTapState}`;
+    //     //
+    //     //     const cardWrap = document.getElementById("cardWrap")
+    //     //
+    //     //     cardWrap.classList.add("show");
+    //     //     setTimeout(()=>{
+    //     //         cardWrap.classList.add("fadein");
+    //     //     },100)
+    //     // }
+    // }
+
+    // 重置游戏
+    // document.getElementById("cardWrap").addEventListener("click", ()=>{
+    //     if(canInit){
+    //         console.log("cardWrap Clicked");
+    //         init(1100);
+    //     }
+    // })
+
+    // 为啥 要先完整的执行一遍动画  才会执行 这里边的片段
+    // anim.playSegments([[100, 200],[150, 250],[200, 300],[250, 350],[300, 400],[350, 450],[400, 500]], true);
+
+</script>
+</html>

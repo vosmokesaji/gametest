@@ -47,7 +47,6 @@
   font-weight: bold;
   cursor: pointer;
   letter-spacing: 3px;
-  transition: all 0.1s ease-in-out;
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
   -webkit-touch-callout: none;
   -moz-touch-callout: none;
@@ -60,7 +59,7 @@
   user-select: none;
 }
 
-.toggle:active {
+.toggle.active {
   background-color: rgba(0, 0, 0, 0.6);
   transform: translateY(2px);
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
