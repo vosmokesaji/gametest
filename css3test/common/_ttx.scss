@@ -1,0 +1,27 @@
+.ttx{
+    -webkit-animation: ttx 3s infinite;
+}
+@keyframes ttx {
+    0%{ transform: translateX(0); }
+    50%{ transform: translateX(500%); }
+    100%{ transform: translateX(0); }
+}
+
+// 这个 在魅族手机上好使
+@-webkit-keyframes ttx {
+    0%{ transform: translateX(0); }
+    50%{ transform: translateX(500%); }
+    100%{ transform: translateX(0); }
+}
+
+
+
+.scale{
+    -webkit-animation: scale 3s infinite;
+}
+
+@-webkit-keyframes scale {
+    0%{ -webkit-transform: scale(0); }
+    50%{ -webkit-transform: scale(2); }
+    100%{ -webkit-transform: scale(0); }
+}

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CSS3 TEST</title>
+    <link rel="stylesheet" href="./index.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/1.12.4/jquery.js"></script>
+</head>
+<body>
+    <div class="content">
+        <div class="item">
+            <p class="title">transform: translateX;</p>
+            <div class="box-wrap">
+                <div class="box ttx"></div>
+            </div>
+        </div>
+
+        <div class="item">
+            <p class="title">transform: scale;</p>
+            <div class="box-wrap">
+                <div class="box scale"></div>
+            </div>
+        </div>
+
+        <div class="item">
+            <p class="title">transform: scale; No animation</p>
+            <div class="toggle">TOGGLE</div>
+            <div class="box-wrap">
+                <div class="box scale2"></div>
+            </div>
+        </div>
+
+
+    </div>
+
+<script>
+$("body").on("click", ".toggle", function(e){
+    console.log("wwww")
+    const box = $(this).parents(".item").find(".box-wrap");
+
+    console.log(box)
+    box.toggleClass("active");
+})
+</script>
+</body>
+</html>
