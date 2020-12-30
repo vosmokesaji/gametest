@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<style>
+
+    div{
+        height: 800px;
+        width: 160px;
+        background: repeating-linear-gradient(160deg, #ffb829, #ffb829 100px, #ffd067 0, #ffd067 200px);
+        animation: progressRoll .5s linear infinite;
+    }
+
+    @keyframes progressRoll{
+        from{
+            background-position-y: 0;
+        }
+        to{
+            background-position-y: 212.836px;
+        }
+    }
+</style>
+<body>
+    <div></div>
+</body>
+</html>

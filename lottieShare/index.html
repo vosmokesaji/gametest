@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lottie Share</title>
+
+    <!-- 第一步: 引入 lottie -->
+    <script src="./js/lottie.min.js"></script>
+
+    <style>
+        #anmiBox{
+            width: 400px;
+            height: 1000px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- 第二步: 创建容器 -->
+    <div id="anmiBox"></div>
+
+    <script>
+        // 第三步: 实例化
+        const anim = lottie.loadAnimation({
+            container: document.getElementById("anmiBox"), // 容器
+            renderer: "canvas",
+            loop: true,
+            autoplay: true,
+            path: "./anmiData/all.json"
+        });
+
+        // 调整速度
+        anim.setSpeed(1);
+
+        // 设置播放方向
+        // anim.setDirection(-1);
+
+        // 设置播放片段
+        // anim.playSegments([100, 110], false);
+
+        // 设置是否补间
+        // anim.setSubframe(false);
+
+
+        // 事件：进入帧
+        // anim.onEnterFrame = function(e){
+        //     console.log(e.currentTime);
+        // }
+
+
+    </script>
+
+
+
+
+
+
+</body>
+</html>

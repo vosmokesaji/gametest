@@ -33,7 +33,8 @@
 
         #container{
             overflow: hidden;
-
+            width: 400px;
+            height: 1100px;
         }
 
         .btn{
@@ -265,7 +266,7 @@
     // 第三步: 实例化
     var anim = lottie.loadAnimation({
         container: document.getElementById("container"), // 容器
-        renderer: "svg",
+        renderer: "canvas",
         loop: true,
         autoplay: false,
         path: "ali-data.json" // the path to the animation json
