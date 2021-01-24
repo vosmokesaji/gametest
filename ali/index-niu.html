@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>lottie 极简Demo</title>
+
+    <script type="text/javascript" src="//cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
+    <!-- 第一步: 引入 lottie -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.5/lottie.min.js" integrity="sha512-0bCDSnaX8FOD9Mq8WbHcDwshXwCB5V4EP+UBu87WQgga2b7lAsuEbaSmIZjH/XEmNhJuhrPbFHemre5HZwrk9w==" crossorigin="anonymous"></script>
+    <style>
+        body{
+            margin: 0;
+            position: relative;
+            background-color: #251149;
+        }
+        html,body{
+            height: 100vh;
+            width: 100vw;
+            /* overflow: hidden; */
+        }
+        #container{
+            overflow: hidden;
+
+        }
+
+        .btn{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            height: 120px;
+            width: 200px;
+            background-color: rgba(0,0,0,0.3);
+            border-radius: 30px;
+
+            position: absolute;
+            top: 610px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            transition: all .2s ease-in-out;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -webkit-user-select: none;
+            user-select: none;
+            /*opacity: 0;*/
+        }
+
+
+
+
+
+        .card-wrap{
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            perspective: 500px;
+            -webkit-perspective: 500px;
+        }
+        .card-wrap.show{
+            display: flex;
+        }
+        .card-scale{
+            transform: scale(0.1);
+            transition: all 1s cubic-bezier(0.29, 1.72, 0.55, 1.01);
+            perspective: 500px;
+            -webkit-perspective: 500px;
+        }
+        .card{
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            background-color: #fdbb25;
+            border-radius: 20px;
+            height: 360px;
+            width: 280px;
+            color: #b7701e;
+            opacity: 0;
+            transform: rotateY(360deg);
+            transition: all 1.5s cubic-bezier(0.29, 1.64, 0.55, 0.99);
+            overflow: hidden;
+
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .light{
+            cursor: pointer;
+            position: absolute;
+            left: -100%;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-image: -webkit-linear-gradient(0deg,hsla(0,0%,100%,0),hsla(0,0%,100%,.5),hsla(0,0%,100%,0));
+            transform: skewx(-25deg);
+            -o-transform: skewx(-25deg);
+            -moz-transform: skewx(-25deg);
+            -webkit-transform: skewx(-25deg);
+            animation-name: light;
+            animation-duration: 6s;
+            animation-iteration-count: infinite;
+        }
+
+
+        .fadein .card{
+            transform: rotateY(0deg);
+            opacity: 1;
+            box-shadow: 0 0 40px rgba(251,187,37,0.9);
+            animation-name: bilibili;
+            animation-duration: 4s;
+            animation-iteration-count: infinite;
+        }
+        .fadein .card-scale{
+            transform: scale(1);
+        }
+
+        @keyframes bilibili {
+            0%{ box-shadow: 0 0 20px rgba(251,187,37,0.6); }
+            20%{ box-shadow: 0 0 60px rgba(251,187,37,0.9); }
+            100%{ box-shadow: 0 0 20px rgba(251,187,37,0.6); }
+        }
+        @keyframes light {
+            0%{ left: -120%; }
+            30%{ left: 120%; }
+            99.9%{ left: 120%; }
+            100%{ left: -120%; }
+        }
+    </style>
+</head>
+<body>
+<!-- 第二步: 创建容器 -->
+<div id="container"></div>
+
+
+<div class="btn" id="fly">起飞</div>
+
+<div class="card-wrap" id="cardWrap">
+    <div class="card-scale">
+        <div class="card">
+            一飞冲天
+            <i class="light"></i>
+        </div>
+    </div>
+</div>
+
+</body>
+<script>
+    let cOpen = false;
+    const CLOG = function(a){
+        if(cOpen){
+            console.log(a)
+        }
+    }
+    
+    
+    // ready 动画循环的定时器
+    let readyTimer;
+
+    // 按下蓄力动画的定时器
+    let pressTimer;
+    
+    // 卡片锁 ， 为 true 表示卡片此时已经展示，不能再出卡片了；为 false 时表示卡片未展示，可以进入展示卡片的逻辑
+    let cardLock = false;
+
+    // 0 可以按下  1： 按下中  2 抬起，但在动画过程中 ，不可再次点击
+    let buttonTapState = 0;
+
+    // init 执行过程中 这个值是 false
+    let canInit = true;
+    
+    lottie.setQuality("high");
+
+
+    // 第三步: 实例化
+    var anim = lottie.loadAnimation({
+        container: document.getElementById("container"), // 容器
+        renderer: "svg",
+        loop: false,
+        autoplay: false,
+        path: "https://wos2.58cdn.com.cn/DeFazYxWvDti/frsupload/52882992417d1ace0d51d76a8d1472c6_niu_1231.json" // the path to the animation json
+    });
+
+    CLOG("ready loop")
+
+
+    function frame2ms(start, end, frameRate) {
+        return Math.floor(Math.abs(end - start) / frameRate * 1000);
+    }
+
+    /** 动画分为三个阶段
+     * 1. ready 准备阶段：
+     * 2. press 蓄力阶段：
+     * 3. 飞行阶段
+     * @type {{READY_END: number, FLY_START: number, FLY_END: number, READY_START: number, PRESS_START: number, FRAME_RATE: number, PRESS_END: number, BOOM_FRAME: number}}
+     */
+
+    const CFG = {
+        // 这个帧率是可以通过配置文件获取到的（应该不用配置）
+        FRAME_RATE: 24,
+
+        READY_START: 0,
+        READY_END: 40,
+
+        PRESS_START: 41,
+        PRESS_END: 66,
+
+        FLY_START: 67,
+        FLY_END: 200,
+
+        BOOM_FRAME: 190,
+    }
+
+    // ready 时间
+    CFG.READY_TIME_MS = frame2ms(CFG.READY_END, CFG.READY_START, CFG.FRAME_RATE);
+    // CLOG("=======", CFG.READY_TIME_MS);
+
+    // press
+    CFG.PRESS_TIME_MS = frame2ms(CFG.PRESS_END, CFG.PRESS_START, CFG.FRAME_RATE);
+
+
+
+    // 初始化 动画
+    init = function(timeout) {
+        canInit = false;
+        CLOG("init called =======================");
+        const cardWrap = document.getElementById("cardWrap")
+        cardWrap.classList.remove("fadein");
+
+        const readyFn = function(){
+            CLOG("ready loop");
+            anim.playSegments([CFG.READY_START, CFG.READY_END], true);
+            readyTimer = setTimeout(()=>{
+                readyFn();
+                CLOG("in readyTimer");
+            }, CFG.READY_TIME_MS);
+        }
+        readyFn();
+
+        setTimeout(()=>{
+            cardWrap.classList.remove("show");
+            cardLock = false;
+            canInit = true;
+        }, timeout);
+    }
+
+    init(0);
+
+
+    const fly = document.getElementById("fly");
+
+    fly.addEventListener("touchstart", (e)=>{
+        CLOG("按钮按下 ===========================");
+
+        if(buttonTapState !== 0) return;
+        buttonTapState = 1;
+
+        e.target.style.backgroundColor = "rgba(0,0,0,0.6)";
+        fly.innerText = `起飞${buttonTapState}`;
+
+        clearTimeout(readyTimer);
+
+
+        const startFn = function(){
+            CLOG("按下 loop")
+            anim.playSegments([CFG.PRESS_START, CFG.PRESS_END], true);
+            pressTimer = setTimeout(()=>{
+                startFn();
+                CLOG("in 按下Timer");
+            }, CFG.PRESS_TIME_MS);
+        }
+        startFn();
+
+    })
+
+    fly.addEventListener("touchend", (e)=>{
+        CLOG("按钮抬起 ===========================");
+
+        if(buttonTapState !== 1) return;
+        buttonTapState = 2;
+        fly.innerText = `起飞${buttonTapState}`;
+
+        e.target.style.backgroundColor = "";
+
+        clearTimeout(pressTimer);
+        anim.playSegments([CFG.FLY_START, CFG.FLY_END], true);
+    })
+
+
+    // 抓住爆炸的时机 触发卡片
+    anim.onEnterFrame = function(e){
+
+
+        // 爆炸逻辑
+        if(e.totalTime === (CFG.FLY_END - CFG.FLY_START)
+            && e.currentTime >= (CFG.BOOM_FRAME - CFG.FLY_START)
+            && !cardLock){
+            CLOG("爆炸逻辑 ======================");
+
+
+            if(buttonTapState !== 2) return;
+            buttonTapState = 0;
+            cardLock = true;
+            fly.innerText = `起飞${buttonTapState}`;
+
+            const cardWrap = document.getElementById("cardWrap")
+
+            cardWrap.classList.add("show");
+            setTimeout(()=>{
+                cardWrap.classList.add("fadein");
+            },100)
+        }
+
+
+        // 起飞逻辑
+        // if(e.totalTime === (CFG.PRESS_END - CFG.PRESS_START)
+        //     && e.currentTime >= (CFG.BOOM_FRAME - CFG.FLY_START)
+        //     && !cardLock){
+        //
+        //     if(buttonTapState !== 2) return;
+        //     buttonTapState = 0;
+        //     cardLock = true;
+        //     fly.innerText = `起飞${buttonTapState}`;
+        //
+        //     const cardWrap = document.getElementById("cardWrap")
+        //
+        //     cardWrap.classList.add("show");
+        //     setTimeout(()=>{
+        //         cardWrap.classList.add("fadein");
+        //     },100)
+        // }
+    }
+
+    // 重置游戏
+    document.getElementById("cardWrap").addEventListener("click", ()=>{
+        if(canInit){
+            CLOG("cardWrap Clicked");
+            init(1100);
+        }
+    })
+
+</script>
+</html>
