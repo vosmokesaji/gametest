@@ -9,13 +9,16 @@
     <script src="./js/lottie.min.js"></script>
 
     <style>
+        body{
+            margin: 0;
+        }
         #anmiBox{
-            width: 400px;
-            height: 1000px;
+            width: 414px;
+            height: 900px;
             margin: 0 auto;
         }
     </style>
-</head>
+</head> 
 <body>
     
     <!-- 第二步: 创建容器 -->
@@ -25,10 +28,10 @@
         // 第三步: 实例化
         const anim = lottie.loadAnimation({
             container: document.getElementById("anmiBox"), // 容器
-            renderer: "canvas",
+            renderer: "svg",
             loop: true,
             autoplay: true,
-            path: "./anmiData/niu_changecolor3.json"
+            path: "./anmiData/niu_changecolor.json"
         });
 
         // 调整速度
